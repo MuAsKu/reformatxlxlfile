@@ -23,22 +23,24 @@ const ENTRANCE_REGEX =
   /(?:^|[^\p{L}\p{N}_])(?:под[ъь]езд|entrance|entry|section|секция)\s*[№#:-]?\s*([a-zа-я0-9-]+)/iu;
 
 const STATUS_LABELS = {
-  FREE: "Свободен",
+  FREE: "Свободно",
+  FREE_LEGACY: "Свободен",
   RESERVED: "Забронировано",
   UNAVAILABLE: "Недоступно",
 };
 
 const CSV_HEADERS = [
-  "Статус",
-  "Квартира",
-  "Площадь",
-  "Тип квартиры",
+  "Номер помещения",
+  "Цена за м2",
+  "Валюта",
   "Этаж",
-  "Блок",
-  "Подъезд",
-  "Лист",
-  "Ячейка",
-  "Цвет",
+  "Название подъезда",
+  "Общая площадь, м2",
+  "Статус",
+  "Кол-во комнат",
+  "Название ЖК",
+  "Название дома",
+  "Описание помещения",
 ];
 
 const FIELD_SCORING_RULES = {
@@ -122,7 +124,26 @@ const FIELD_SCORING_RULES = {
     compactTextBonus: 2,
     minimumScore: 24,
   },
+  section: {
+    baseScore: 96,
+    rowPenalty: 14,
+    colPenalty: 12,
+    rowOverlapBonus: 8,
+    colOverlapBonus: 28,
+    sameRowBonus: 12,
+    sameColumnBonus: 18,
+    aboveBonus: 20,
+    belowPenalty: 10,
+    leftBonus: 4,
+    rightBonus: 4,
+    hiddenPenalty: 4,
+    compactTextBonus: 4,
+    minimumScore: 22,
+  },
 };
+
+const SECTION_REGEX =
+  /^(?:секция|секции|описание|планировка)?\s*([абaб])(?:\s*тип)?$/iu;
 
 module.exports = {
   APARTMENT_REGEX,
@@ -131,6 +152,7 @@ module.exports = {
   FLOOR_REGEXES,
   BLOCK_REGEX,
   ENTRANCE_REGEX,
+  SECTION_REGEX,
   STATUS_LABELS,
   CSV_HEADERS,
   FIELD_SCORING_RULES,

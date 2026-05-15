@@ -4,6 +4,7 @@ const ExcelJS = require("exceljs");
 
 const { detectApartmentStatus } = require("./color-detector");
 const { createContextAnalyzer } = require("./context-analyzer");
+const { extractSheetMetadata } = require("./metadata-extractor");
 const { createThemePalette } = require("./theme-resolver");
 const { buildSheetModel } = require("./workbook-model");
 const {
@@ -25,6 +26,9 @@ const {
  *   floorValue: number,
  *   block: string,
  *   entrance: string,
+ *   section: string,
+ *   complexName: string,
+ *   houseName: string,
  *   sheet: string,
  *   cell: string,
  *   color: string
@@ -45,6 +49,7 @@ async function parseWorkbookFile(inputPath) {
       continue;
     }
 
+    const sheetMetadata = extractSheetMetadata(sheetModel.cells);
     const contextAnalyzer = createContextAnalyzer(sheetModel);
 
     for (const apartmentCell of sheetModel.apartments) {
@@ -62,6 +67,9 @@ async function parseWorkbookFile(inputPath) {
         floorValue: extractSortableNumber(context.floor),
         block: context.block,
         entrance: context.entrance,
+        section: context.section,
+        complexName: sheetMetadata.complexName,
+        houseName: sheetMetadata.houseName,
         sheet: worksheet.name,
         cell: apartmentCell.address,
         color: status.color,

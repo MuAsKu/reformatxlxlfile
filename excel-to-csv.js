@@ -25,7 +25,8 @@ async function main() {
   const csv = exportRecordsToCsv(records);
   await fs.writeFile(outputPath, csv, "utf8");
 
-  console.log(`Готово: найдено ${records.length} квартир.`);
+  const crmRowCount = records.length;
+  console.log(`Готово: найдено ${crmRowCount} помещений.`);
   console.log(`CSV сохранен в: ${outputPath}`);
 
   if (records.length === 0) {
@@ -75,10 +76,10 @@ function printHelp() {
   console.log("  - ищет квартиры по всему листу (Кв-1, КВ12, apt 15 и т.д.)");
   console.log("  - анализирует соседний контекст без привязки к координатам");
   console.log("  - определяет статус по цвету ячейки");
-  console.log("  - экспортирует результат в CSV");
+  console.log("  - экспортирует CSV в формате импорта (11 колонок)");
   console.log("");
   console.log("Статусы по цвету:");
-  console.log("  Белый / без заливки -> Свободен");
+  console.log("  Белый / без заливки -> Свободно");
   console.log("  Синий -> Забронировано");
   console.log("  Фиолетовый -> Недоступно");
 }

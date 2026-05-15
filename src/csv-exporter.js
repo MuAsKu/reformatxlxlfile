@@ -1,37 +1,29 @@
 "use strict";
 
 const { CSV_HEADERS } = require("./constants");
+const { mapRecordsToCrmRows } = require("./crm-mapper");
 
 /**
- * @param {Array<{
- *   status: string,
- *   apartment: string,
- *   area: string,
- *   type: string,
- *   floor: string,
- *   block: string,
- *   entrance: string,
- *   sheet: string,
- *   cell: string,
- *   color: string
- * }>} records
+ * @param {Array<object>} records
  * @returns {string}
  */
 function exportRecordsToCsv(records) {
+  const crmRows = mapRecordsToCrmRows(records);
   const lines = [CSV_HEADERS];
 
-  for (const record of records) {
+  for (const row of crmRows) {
     lines.push([
-      record.status,
-      record.apartment,
-      record.area,
-      record.type,
-      record.floor,
-      record.block,
-      record.entrance,
-      record.sheet,
-      record.cell,
-      record.color,
+      row.roomNumber,
+      row.pricePerSqm,
+      row.currency,
+      row.floor,
+      row.entrance,
+      row.area,
+      row.status,
+      row.rooms,
+      row.complexName,
+      row.houseName,
+      row.description,
     ]);
   }
 

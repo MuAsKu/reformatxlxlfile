@@ -6,6 +6,7 @@ const {
   ENTRANCE_REGEX,
   FIELD_SCORING_RULES,
   FLOOR_REGEXES,
+  SECTION_REGEX,
   TYPE_REGEXES,
 } = require("./constants");
 const { getSpatialRelation, parseLocalizedNumber } = require("./utils");
@@ -19,7 +20,8 @@ const { getSpatialRelation, parseLocalizedNumber } = require("./utils");
  *     type: string,
  *     floor: string,
  *     block: string,
- *     entrance: string
+ *     entrance: string,
+ *     section: string
  *   }
  * }}
  */
@@ -34,6 +36,7 @@ function createContextAnalyzer(sheetModel) {
         floor: pickBestValue(apartmentCell, candidateIndex.floor, "floor"),
         block: pickBestValue(apartmentCell, candidateIndex.block, "block"),
         entrance: pickBestValue(apartmentCell, candidateIndex.entrance, "entrance"),
+        section: pickBestValue(apartmentCell, candidateIndex.section, "section"),
       };
     },
   };
@@ -46,7 +49,8 @@ function createContextAnalyzer(sheetModel) {
  *   type: Array<object>,
  *   floor: Array<object>,
  *   block: Array<object>,
- *   entrance: Array<object>
+ *   entrance: Array<object>,
+ *   section: Array<object>
  * }}
  */
 function buildCandidateIndex(cells) {
@@ -56,6 +60,7 @@ function buildCandidateIndex(cells) {
     floor: [],
     block: [],
     entrance: [],
+    section: [],
   };
 
   for (const cell of cells) {
@@ -70,7 +75,7 @@ function buildCandidateIndex(cells) {
 /**
  * @param {object} apartmentCell
  * @param {Array<object>} candidates
- * @param {"area"|"type"|"floor"|"block"|"entrance"} field
+ * @param {"area"|"type"|"floor"|"block"|"entrance"|"section"} field
  * @returns {string}
  */
 function pickBestValue(apartmentCell, candidates, field) {
@@ -96,7 +101,7 @@ function pickBestValue(apartmentCell, candidates, field) {
 /**
  * @param {object} apartmentCell
  * @param {object} candidate
- * @param {"area"|"type"|"floor"|"block"|"entrance"} field
+ * @param {"area"|"type"|"floor"|"block"|"entrance"|"section"} field
  * @param {object} rules
  * @returns {number}
  */
@@ -152,7 +157,7 @@ function scoreCandidate(apartmentCell, candidate, field, rules) {
 /**
  * @param {object} apartmentCell
  * @param {object} candidate
- * @param {"area"|"type"|"floor"|"block"|"entrance"} field
+ * @param {"area"|"type"|"floor"|"block"|"entrance"|"section"} field
  * @param {ReturnType<typeof getSpatialRelation>} relation
  * @returns {number}
  */
@@ -221,6 +226,17 @@ function getFieldSpecificBonus(apartmentCell, candidate, field, relation) {
     return bonus;
   }
 
+  if (field === "section") {
+    let bonus = 0;
+    if (/секция|описание|планировка/.test(searchText)) {
+      bonus += 12;
+    }
+    if (relation.colOverlap && (relation.isAbove || relation.sameRow)) {
+      bonus += 14;
+    }
+    return bonus;
+  }
+
   return 0;
 }
 
@@ -253,6 +269,11 @@ function extractCandidatesFromCell(cell) {
   const entranceCandidate = extractEntranceCandidate(cell);
   if (entranceCandidate) {
     candidates.push(entranceCandidate);
+  }
+
+  const sectionCandidate = extractSectionCandidate(cell);
+  if (sectionCandidate) {
+    candidates.push(sectionCandidate);
   }
 
   return candidates;
@@ -358,6 +379,26 @@ function extractEntranceCandidate(cell) {
   return {
     field: "entrance",
     value: `Подъезд ${token}`,
+    cell,
+  };
+}
+
+/**
+ * @param {object} cell
+ * @returns {object|null}
+ */
+function extractSectionCandidate(cell) {
+  const match = cell.text.match(SECTION_REGEX);
+  if (!match) {
+    return null;
+  }
+
+  const token = String(match[1]).toUpperCase().replace("А", "A").replace("В", "B");
+  const value = token === "B" || token === "Б" ? "Б" : "A";
+
+  return {
+    field: "section",
+    value,
     cell,
   };
 }
