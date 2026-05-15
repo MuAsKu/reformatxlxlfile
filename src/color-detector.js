@@ -4,7 +4,7 @@ const { STATUS_LABELS } = require("./constants");
 const { resolveColorToHex } = require("./theme-resolver");
 
 /**
- * Extract fill metadata and resolve theme colors to concrete RGB.
+ * 
  * @param {import("exceljs").Cell} cell
  * @param {Map<number, string>} [themePalette]
  * @returns {{ pattern: string, hex: string|null, raw: string, source: string }}
