@@ -1,0 +1,14 @@
+{
+  "name": "excel-color-to-csv",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Convert apartment Excel sheets to CSV grouped by fill color status.",
+  "main": "excel-to-csv.js",
+  "scripts": {
+    "convert": "node excel-to-csv.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  }
+}
